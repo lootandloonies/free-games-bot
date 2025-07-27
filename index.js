@@ -20,7 +20,21 @@ console.log('Sample games:', data.slice(0, 5).map(g => g.title));
 
     console.log('API sample data (first 5 games):', data.slice(0, 5)); // Debug log
 
-    const filteredGames = data;
+    const allowedTypes = ['game', 'full', 'giveaway', 'key'];
+
+const filteredGames = data.filter(game => {
+  const type = (game.type || '').toLowerCase();
+  const platform = (game.platform || '').toLowerCase();
+
+  const isGame = allowedTypes.some(t => type.includes(t));
+  const isPlatformInteresting = platform.includes('steam') || platform.includes('epic') || platform.includes('itch');
+
+  // Optional: log some examples
+  console.log(`Title: "${game.title}" | Type: "${type}" | Platform: "${platform}" | isGame: ${isGame} | isPlatformInteresting: ${isPlatformInteresting}`);
+
+  return isGame || isPlatformInteresting;
+});
+
 
 
     let message = '🎮 Free Games: ';
