@@ -14,6 +14,9 @@ app.get('/free-games', async (req, res) => {
 
     const response = await fetch('https://www.gamerpower.com/api/giveaways?platform=pc');
     const data = await response.json();
+    console.log(`API returned ${data.length} games.`);
+console.log('Sample games:', data.slice(0, 5).map(g => g.title));
+
 
     console.log('API sample data (first 5 games):', data.slice(0, 5)); // Debug log
 
