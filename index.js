@@ -43,9 +43,26 @@ const filteredGames = data.filter(game => {
       message += 'No full games available right now. Check back later!';
     } else {
       const paginatedGames = filteredGames.slice(start, end).map(game => {
-        const worth = game.worth || 'Free';
-        return `${game.title} [${worth}] ➜ ${game.open_giveaway_url}`;
-      });
+  const worth = game.worth || 'Free';
+  const title = game.title || '';
+  const url = game.open_giveaway_url || '';
+  const platform = (game.platform || '').toLowerCase();
+
+  // Platform detection
+  let platformLabel = '';
+  if (url.includes('steam') || title.toLowerCase().includes('steam') || platform.includes('steam')) {
+    platformLabel = 'Steam';
+  } else if (url.includes('epic') || title.toLowerCase().includes('epic') || platform.includes('epic')) {
+    platformLabel = 'Epic';
+  } else if (url.includes('itch') || title.toLowerCase().includes('itch') || platform.includes('itch')) {
+    platformLabel = 'Itch.io';
+  } else {
+    platformLabel = 'PC';
+  }
+
+  return `${title} [${platformLabel}, ${worth}] ➜ ${url}`;
+});
+
 
       if (paginatedGames.length === 0) {
         message += `No games found on page ${page}.`;
