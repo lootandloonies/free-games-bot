@@ -15,33 +15,38 @@ app.get('/free-games', async (req, res) => {
     const response = await fetch('https://www.gamerpower.com/api/giveaways?platform=pc');
     const data = await response.json();
 
-    // Looser filter: type contains "full" (case-insensitive)
-    const allowedTypes = ['full game', 'game', 'full'];
-    const filteredGames = data.filter(game =>
-      game.type &&
-      allowedTypes.some(type =>
-        game.type.toLowerCase().includes(type)
-      )
-    );
+    console.log('API sample data (first 5 games):', data.slice(0, 5)); // Debug log
+
+    const allowedTypes = ['full game', 'game', 'full', 'free'];
+
+    const filteredGames = data.filter(game => {
+      const isFreeByPrice = game.price === 0;
+      const isFreeByFlag = game.isFree === true;
+      const typeAllowed = game.type && allowedTypes.some(type => game.type.toLowerCase().includes(type));
+      const isSteam = game.platform && game.platform.toLowerCase().includes('steam');
+
+      // Return games that are free by price or flag, AND either have allowed type or are Steam platform
+      return (isFreeByPrice || isFreeByFlag) && (typeAllowed || isSteam);
+    });
 
     let message = '🎮 Free Games: ';
 
     if (filteredGames.length === 0) {
       message += 'No full games available right now. Check back later!';
     } else {
-   const paginatedGames = filteredGames.slice(start, end).map(game => {
-  const worth = game.worth || 'Free';
-  return `${game.title} [${worth}] ➜ ${game.open_giveaway_url}`;
-});
+      const paginatedGames = filteredGames.slice(start, end).map(game => {
+        const worth = game.worth || 'Free';
+        return `${game.title} [${worth}] ➜ ${game.open_giveaway_url}`;
+      });
 
-if (paginatedGames.length === 0) {
-  message += `No games found on page ${page}.`;
-} else {
-  message += paginatedGames.join(' | ');
+      if (paginatedGames.length === 0) {
+        message += `No games found on page ${page}.`;
+      } else {
+        message += paginatedGames.join(' | ');
 
-  const totalPages = Math.ceil(filteredGames.length / pageSize);
-  message += ` (Page ${page} of ${totalPages})`;
-}
+        const totalPages = Math.ceil(filteredGames.length / pageSize);
+        message += ` (Page ${page} of ${totalPages})`;
+      }
 
       if (message.length > 400) {
         message = message.slice(0, 397) + '...';
@@ -54,6 +59,7 @@ if (paginatedGames.length === 0) {
     res.status(500).send('Failed to fetch free games');
   }
 });
+
 
 
 app.get('/free-betas', async (req, res) => {
