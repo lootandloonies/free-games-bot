@@ -22,7 +22,7 @@ console.log('Sample games:', data.slice(0, 5).map(g => g.title));
 
     const allowedTypes = ['full game', 'game', 'full', 'free'];
 
-   const filteredGames = data.filter(game => {
+ const filteredGames = data.filter(game => {
   // Normalize price to a number (or NaN if missing)
   const priceNum = Number(game.price);
   const isFreeByPrice = !isNaN(priceNum) && priceNum === 0;
@@ -30,21 +30,11 @@ console.log('Sample games:', data.slice(0, 5).map(g => g.title));
   // Check isFree flag explicitly for boolean true
   const isFreeByFlag = game.isFree === true;
 
-  // Check allowed types lowercase safely
-  const typeAllowed = game.type && allowedTypes.some(type => game.type.toLowerCase().includes(type));
-
-  // Platform might be string or array - handle both
-  let isSteam = false;
-  if (Array.isArray(game.platform)) {
-    isSteam = game.platform.some(p => p.toLowerCase().includes('steam'));
-  } else if (typeof game.platform === 'string') {
-    isSteam = game.platform.toLowerCase().includes('steam');
-  }
-
   // Debug log for each game considered
-  console.log(`Game: "${game.title}", price: ${game.price}, isFree: ${game.isFree}, type: ${game.type}, platform: ${game.platform}, isFreeByPrice: ${isFreeByPrice}, isFreeByFlag: ${isFreeByFlag}, typeAllowed: ${typeAllowed}, isSteam: ${isSteam}`);
+  console.log(`Game: "${game.title}", price: ${game.price}, isFree: ${game.isFree}`);
 
-  return (isFreeByPrice || isFreeByFlag) && (typeAllowed || isSteam);
+  // Return true if price is 0 or isFree is true
+  return isFreeByPrice || isFreeByFlag;
 });
 
 
@@ -107,6 +97,20 @@ app.get('/free-betas', async (req, res) => {
     console.error('Error fetching betas:', error);
     res.status(500).send('Failed to fetch betas');
   }
+});
+app.get('/free-steam', (req, res) => {
+  const steamFreeGames = [
+    {
+      title: 'RogueStone',
+      url: 'https://store.steampowered.com/app/1955990/RogueStone/',
+      worth: 'Free'
+    },
+    // Add more Steam freebies here
+  ];
+
+  const message = steamFreeGames.map(game => `${game.title} [${game.worth}] ➜ ${game.url}`).join(' | ');
+
+  res.send(`🎮 Free Steam Games: ${message}`);
 });
 
 app.listen(PORT, () => {
