@@ -19,15 +19,31 @@ app.get('/free-games', async (req, res) => {
 
     const allowedTypes = ['full game', 'game', 'full', 'free'];
 
-    const filteredGames = data.filter(game => {
-      const isFreeByPrice = game.price === 0;
-      const isFreeByFlag = game.isFree === true;
-      const typeAllowed = game.type && allowedTypes.some(type => game.type.toLowerCase().includes(type));
-      const isSteam = game.platform && game.platform.toLowerCase().includes('steam');
+   const filteredGames = data.filter(game => {
+  // Normalize price to a number (or NaN if missing)
+  const priceNum = Number(game.price);
+  const isFreeByPrice = !isNaN(priceNum) && priceNum === 0;
 
-      // Return games that are free by price or flag, AND either have allowed type or are Steam platform
-      return (isFreeByPrice || isFreeByFlag) && (typeAllowed || isSteam);
-    });
+  // Check isFree flag explicitly for boolean true
+  const isFreeByFlag = game.isFree === true;
+
+  // Check allowed types lowercase safely
+  const typeAllowed = game.type && allowedTypes.some(type => game.type.toLowerCase().includes(type));
+
+  // Platform might be string or array - handle both
+  let isSteam = false;
+  if (Array.isArray(game.platform)) {
+    isSteam = game.platform.some(p => p.toLowerCase().includes('steam'));
+  } else if (typeof game.platform === 'string') {
+    isSteam = game.platform.toLowerCase().includes('steam');
+  }
+
+  // Debug log for each game considered
+  console.log(`Game: "${game.title}", price: ${game.price}, isFree: ${game.isFree}, type: ${game.type}, platform: ${game.platform}, isFreeByPrice: ${isFreeByPrice}, isFreeByFlag: ${isFreeByFlag}, typeAllowed: ${typeAllowed}, isSteam: ${isSteam}`);
+
+  return (isFreeByPrice || isFreeByFlag) && (typeAllowed || isSteam);
+});
+
 
     let message = '🎮 Free Games: ';
 
