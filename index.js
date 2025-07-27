@@ -22,7 +22,7 @@ console.log('Sample games:', data.slice(0, 5).map(g => g.title));
 
     const allowedTypes = ['full game', 'game', 'full', 'free'];
 
- const filteredGames = data.filter(game => {
+const filteredGames = data;
   // Normalize price to a number (or NaN if missing)
   const priceNum = Number(game.price);
   const isFreeByPrice = !isNaN(priceNum) && priceNum === 0;
