@@ -20,22 +20,7 @@ console.log('Sample games:', data.slice(0, 5).map(g => g.title));
 
     console.log('API sample data (first 5 games):', data.slice(0, 5)); // Debug log
 
-    const allowedTypes = ['full game', 'game', 'full', 'free'];
-
-const filteredGames = data;
-  // Normalize price to a number (or NaN if missing)
-  const priceNum = Number(game.price);
-  const isFreeByPrice = !isNaN(priceNum) && priceNum === 0;
-
-  // Check isFree flag explicitly for boolean true
-  const isFreeByFlag = game.isFree === true;
-
-  // Debug log for each game considered
-  console.log(`Game: "${game.title}", price: ${game.price}, isFree: ${game.isFree}`);
-
-  // Return true if price is 0 or isFree is true
-  return isFreeByPrice || isFreeByFlag;
-});
+    const filteredGames = data;
 
 
     let message = '🎮 Free Games: ';
